@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>AI Convert PDF to XRechnung with InvoiceXML API</title>
+<!--
+  Experimental: convert a plain PDF invoice to XRechnung using AI.
+  Review the output manually before sending to a customer or tax authority.
+
+  Get API key: https://www.invoicexml.com/account/authentication
+  Docs:        https://www.invoicexml.com/docs/api/transform/to/xrechnung
+
+  WARNING: do not ship API keys in production browser code. Proxy through
+  your own backend so the key stays server-side.
+-->
+
+<h1>Convert PDF to XRechnung (AI, experimental)</h1>
+<input type="file" id="file" accept="application/pdf">
+<label for="leitweg">Leitweg-ID</label>
+<input type="text" id="leitweg" value="991-12345-67" size="20">
+<button id="run">Convert</button>
+<p id="status"></p>
+
+<script>
+// Raw key only, without the "Bearer " prefix (it is added below).
+const apiKey = 'YOUR_API_KEY';
+
+document.getElementById('run').addEventListener('click', async () => {
+    const file = document.getElementById('file').files[0];
+    if (!file) return alert('Choose a PDF first.');
+    const status = document.getElementById('status');
+    status.textContent = 'Converting (this may take 10-30 seconds)...';
+
+    const form = new FormData();
+    form.append('file', file);
+    // The Leitweg-ID (BT-10) is required: it identifies the German public
+    // authority you are invoicing and cannot be inferred from the PDF.
+    form.append('buyerReference', document.getElementById('leitweg').value);
+
+    const response = await fetch('https://api.invoicexml.com/v1/transform/to/xrechnung', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + apiKey },
+        body: form,
+    });
+
+    if (!response.ok) {
+        status.textContent = `InvoiceXML API error ${response.status}: ${await response.text()}`;
+        return;
+    }
+
+    const xml = await response.text();
+    const blob = new Blob([xml], { type: 'application/xml' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'converted-xrechnung.xml';
+    a.click();
+    status.textContent = `Downloaded converted-xrechnung.xml (${xml.length} chars). Review manually before sending.`;
+});
+</script>

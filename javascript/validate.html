@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Validate XRechnung with InvoiceXML API</title>
+<!--
+  Get API key: https://www.invoicexml.com/account/authentication
+  Docs:        https://www.invoicexml.com/docs/api/validate/xrechnung
+
+  WARNING: do not ship API keys in production browser code. Proxy through
+  your own backend so the key stays server-side.
+-->
+
+<h1>Validate XRechnung invoice</h1>
+<input type="file" id="file" accept=".xml,application/xml,text/xml">
+<button id="run">Validate</button>
+<pre id="output"></pre>
+
+<script>
+// Raw key only, without the "Bearer " prefix (it is added below).
+const apiKey = 'YOUR_API_KEY';
+
+document.getElementById('run').addEventListener('click', async () => {
+    const file = document.getElementById('file').files[0];
+    if (!file) return alert('Choose an XML file first.');
+
+    const form = new FormData();
+    form.append('file', file);
+
+    const response = await fetch('https://api.invoicexml.com/v1/validate/xrechnung', {
+        method: 'POST',
+        headers: { Authorization: 'Bearer ' + apiKey },
+        body: form,
+    });
+
+    const report = await response.text();
+    document.getElementById('output').textContent =
+        response.ok ? report : `InvoiceXML API error ${response.status}: ${report}`;
+});
+</script>

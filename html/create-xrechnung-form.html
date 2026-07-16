@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Create XRechnung invoice form | InvoiceXML API example</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!--
+  Minimal XRechnung invoice builder. Demonstrates how to:
+    1. POST a JSON invoice to https://api.invoicexml.com/v1/create/xrechnung
+    2. Download the returned XRechnung 3.0 XML on success
+    3. Map validation errors back onto the form fields on failure
+
+  The trick that makes the error mapping trivial: every form input's `name`
+  attribute is the dotted JSON path the API expects (e.g. `seller.postalAddress.line1`).
+  When the API returns an error, each finding includes a `fields: [...]` array
+  of those same paths, so highlighting the offending input is a single
+  `querySelector('[name="<path>"]')` lookup.
+
+  See the full reference at: https://www.invoicexml.com/docs/api/create/xrechnung
+
+  Docs: https://www.invoicexml.com/docs/api/create/xrechnung
+  Get an API key: https://www.invoicexml.com/account/authentication
+
+  WARNING: do not ship API keys in production browser code. Anyone who views
+  the page source can read and reuse your key. For production, proxy this
+  request through your own backend so the key stays server-side.
+-->
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen">
+
+<main class="max-w-3xl mx-auto px-4 py-10">
+
+  <header class="mb-8">
+    <h1 class="text-3xl font-bold text-slate-900">Create an XRechnung invoice</h1>
+    <p class="mt-2 text-slate-600">
+      Fill the form, paste your API token, and submit to receive a validated
+      XRechnung 3.0 XML, ready for ZRE, OZG-RE, or Peppol.
+    </p>
+  </header>
+
+  <!-- Banner shown when the API returns 4001 / 4002 validation errors -->
+  <div id="error-banner" class="hidden mb-6 rounded-md border border-red-300 bg-red-50 p-4">
+    <p class="font-semibold text-red-800">Validation failed</p>
+    <ul id="error-list" class="mt-2 list-disc list-inside text-sm text-red-700 space-y-1"></ul>
+  </div>
+
+  <!-- Banner for non-validation errors (auth, network, server) -->
+  <div id="status-banner" class="hidden mb-6 rounded-md border p-4 text-sm"></div>
+
+  <form id="xrechnung-form" class="space-y-8" novalidate>
+
+    <!-- ── API token ─────────────────────────────────────────── -->
+    <section class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-slate-900">API access</h2>
+      <p class="text-sm text-slate-500 mt-1">
+        Paste a token from
+        <a href="https://www.invoicexml.com/account/authentication" class="text-emerald-600 underline">your dashboard</a>.
+        Not sent anywhere except api.invoicexml.com.
+      </p>
+      <div class="mt-4">
+        <label class="block text-sm font-medium text-slate-700">API token</label>
+        <input id="api-token" type="password" autocomplete="off" required
+               class="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+               placeholder="ix_live_…">
+      </div>
+    </section>
+
+    <!-- ── Invoice header ────────────────────────────────────── -->
+    <section class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-slate-900">Invoice</h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="field">
+          <label>Invoice number *</label>
+          <input name="invoiceNumber" type="text" required value="XR-2026-001">
+        </div>
+        <div class="field">
+          <label>Issue date *</label>
+          <input name="issueDate" type="date" required value="2026-05-18">
+        </div>
+        <div class="field">
+          <label>Currency *</label>
+          <input name="currency" type="text" required value="EUR" maxlength="3">
+        </div>
+        <div class="field sm:col-span-3">
+          <label>Leitweg-ID (BT-10) *</label>
+          <input name="buyerReference" type="text" required value="991-12345-67">
+          <p class="mt-1 text-xs text-slate-500">The routing identifier of the German authority you are invoicing. Required by rule BR-DE-15.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Seller ────────────────────────────────────────────── -->
+    <section class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-slate-900">Seller</h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="field sm:col-span-2">
+          <label>Name *</label>
+          <input name="seller.name" type="text" required value="Acme GmbH">
+        </div>
+        <div class="field">
+          <label>VAT identifier</label>
+          <input name="seller.vatIdentifier" type="text" value="DE123456789">
+        </div>
+        <div class="field">
+          <label>Legal registration</label>
+          <input name="seller.legalRegistration.identifier" type="text" value="HRB 12345">
+        </div>
+        <div class="field sm:col-span-2">
+          <label>Address line 1 *</label>
+          <input name="seller.postalAddress.line1" type="text" required value="Hauptstraße 12">
+        </div>
+        <div class="field">
+          <label>Post code *</label>
+          <input name="seller.postalAddress.postCode" type="text" required value="10115">
+        </div>
+        <div class="field">
+          <label>City *</label>
+          <input name="seller.postalAddress.city" type="text" required value="Berlin">
+        </div>
+        <div class="field">
+          <label>Country (ISO 2) *</label>
+          <input name="seller.postalAddress.country" type="text" required value="DE" maxlength="2">
+        </div>
+        <!-- XRechnung requires the seller contact group (BG-6) and an electronic address (BT-34). -->
+        <div class="field">
+          <label>Contact name *</label>
+          <input name="seller.contact.name" type="text" required value="Max Mustermann">
+        </div>
+        <div class="field">
+          <label>Contact phone *</label>
+          <input name="seller.contact.phone" type="text" required value="+49 30 12345678">
+        </div>
+        <div class="field">
+          <label>Contact email *</label>
+          <input name="seller.contact.email" type="email" required value="billing@acme.de">
+        </div>
+        <div class="field">
+          <label>Electronic address *</label>
+          <input name="seller.electronicAddress.identifier" type="text" required value="DE123456789">
+        </div>
+        <div class="field">
+          <label>Electronic address scheme *</label>
+          <input name="seller.electronicAddress.schemeId" type="text" required value="9930">
+          <p class="mt-1 text-xs text-slate-500">Peppol EAS code, e.g. 9930 (German VAT) or 0204 (Leitweg-ID).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Buyer ─────────────────────────────────────────────── -->
+    <section class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-slate-900">Buyer</h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="field sm:col-span-2">
+          <label>Name *</label>
+          <input name="buyer.name" type="text" required value="Bundesamt für Musterverwaltung">
+        </div>
+        <div class="field sm:col-span-2">
+          <label>Address line 1 *</label>
+          <input name="buyer.postalAddress.line1" type="text" required value="Behördenstraße 5">
+        </div>
+        <div class="field">
+          <label>Post code *</label>
+          <input name="buyer.postalAddress.postCode" type="text" required value="53113">
+        </div>
+        <div class="field">
+          <label>City *</label>
+          <input name="buyer.postalAddress.city" type="text" required value="Bonn">
+        </div>
+        <div class="field">
+          <label>Country (ISO 2) *</label>
+          <input name="buyer.postalAddress.country" type="text" required value="DE" maxlength="2">
+        </div>
+        <div class="field">
+          <label>Electronic address *</label>
+          <input name="buyer.electronicAddress.identifier" type="text" required value="991-12345-67">
+        </div>
+        <div class="field">
+          <label>Electronic address scheme *</label>
+          <input name="buyer.electronicAddress.schemeId" type="text" required value="0204">
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Payment + a single line item ──────────────────────── -->
+    <section class="rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
+      <h2 class="text-lg font-semibold text-slate-900">Payment & line item</h2>
+      <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div class="field sm:col-span-2">
+          <label>IBAN *</label>
+          <input name="paymentDetails.paymentAccountIdentifier" type="text" required
+                 value="DE89370400440532013000">
+        </div>
+        <div class="field sm:col-span-2">
+          <label>Line description *</label>
+          <input name="lines[0].item.name" type="text" required value="Senior consulting">
+        </div>
+        <div class="field">
+          <label>Quantity *</label>
+          <input name="lines[0].quantity" type="number" step="0.01" required value="10">
+        </div>
+        <div class="field">
+          <label>Net price *</label>
+          <input name="lines[0].priceDetails.netPrice" type="number" step="0.01" required value="150">
+        </div>
+        <div class="field">
+          <label>VAT rate (%) *</label>
+          <input name="lines[0].vatInformation.rate" type="number" step="0.01" required value="19">
+        </div>
+        <div class="field">
+          <label>VAT category *</label>
+          <input name="lines[0].vatInformation.categoryCode" type="text" required value="S" maxlength="2">
+        </div>
+      </div>
+    </section>
+
+    <div class="flex items-center gap-3">
+      <button id="submit" type="submit"
+              class="rounded-md bg-emerald-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-60 disabled:cursor-not-allowed">
+        Generate & download XML
+      </button>
+      <span id="submit-status" class="text-sm text-slate-500"></span>
+    </div>
+
+  </form>
+</main>
+
+<!--
+  Tailwind components for fields. Keeping them as `@apply` rules inside a
+  <style> block is a Tailwind play-CDN nicety: it lets us label every
+  form field with `class="field"` and still get utility-driven styling.
+-->
+<style type="text/tailwindcss">
+  .field { @apply flex flex-col; }
+  .field label { @apply text-sm font-medium text-slate-700 mb-1; }
+  .field input {
+    @apply rounded-md border border-slate-300 px-3 py-2 text-sm
+           focus:outline-none focus:ring-2 focus:ring-emerald-500;
+  }
+  .field.has-error input { @apply border-red-500 ring-1 ring-red-500; }
+  .field .field-error { @apply mt-1 text-xs text-red-600; }
+</style>
+
+<script>
+(function () {
+  'use strict';
+
+  const API_URL = 'https://api.invoicexml.com/v1/create/xrechnung';
+  const form          = document.getElementById('xrechnung-form');
+  const submitBtn     = document.getElementById('submit');
+  const submitStatus  = document.getElementById('submit-status');
+  const errorBanner   = document.getElementById('error-banner');
+  const errorList     = document.getElementById('error-list');
+  const statusBanner  = document.getElementById('status-banner');
+  const tokenInput    = document.getElementById('api-token');
+
+  /* ── Path helpers ──────────────────────────────────────────────
+     Input names use dotted paths with array brackets, e.g.
+       seller.postalAddress.line1
+       lines[0].priceDetails.netPrice
+     parsePath turns those into [token, token, ...] with numeric
+     indices preserved, and setDeep writes a value into a nested
+     object/array tree, creating intermediate containers as needed.
+  ─────────────────────────────────────────────────────────────── */
+  function parsePath(path) {
+    const tokens = [];
+    const re = /([^.\[\]]+)|\[(\d+)\]/g;
+    let m;
+    while ((m = re.exec(path)) !== null) {
+      tokens.push(m[2] !== undefined ? parseInt(m[2], 10) : m[1]);
+    }
+    return tokens;
+  }
+  function setDeep(root, path, value) {
+    const tokens = parsePath(path);
+    let cur = root;
+    for (let i = 0; i < tokens.length - 1; i++) {
+      const t = tokens[i];
+      const nextIsIndex = typeof tokens[i + 1] === 'number';
+      if (cur[t] == null) cur[t] = nextIsIndex ? [] : {};
+      cur = cur[t];
+    }
+    cur[tokens[tokens.length - 1]] = value;
+  }
+
+  // Inputs that should be sent as numbers instead of strings.
+  const NUMERIC_NAMES = new Set([
+    'lines[0].quantity',
+    'lines[0].priceDetails.netPrice',
+    'lines[0].vatInformation.rate'
+  ]);
+
+  /* Build the JSON payload by walking every [name] input. Because each
+     name already mirrors the API JSON path, no field-by-field map is needed. */
+  function buildPayload() {
+    const invoice = {};
+    form.querySelectorAll('[name]').forEach(el => {
+      const name = el.getAttribute('name');
+      const raw = (el.value || '').trim();
+      if (raw === '') return;
+      if (NUMERIC_NAMES.has(name)) {
+        const n = parseFloat(raw);
+        if (isNaN(n)) return;
+        setDeep(invoice, name, n);
+      } else {
+        setDeep(invoice, name, raw);
+      }
+    });
+    return { invoice };
+  }
+
+  /* ── Error UI ────────────────────────────────────────────────── */
+  function clearErrors() {
+    errorBanner.classList.add('hidden');
+    errorList.innerHTML = '';
+    statusBanner.classList.add('hidden');
+    statusBanner.className = 'hidden mb-6 rounded-md border p-4 text-sm';
+    form.querySelectorAll('.field.has-error').forEach(f => f.classList.remove('has-error'));
+    form.querySelectorAll('.field-error').forEach(e => e.remove());
+  }
+
+  function markFieldError(path, message) {
+    const el = form.querySelector('[name="' + path + '"]');
+    if (!el) return false;
+    const wrapper = el.closest('.field');
+    if (!wrapper) return false;
+    wrapper.classList.add('has-error');
+    // Don't stack multiple messages on the same input.
+    if (!wrapper.querySelector('.field-error')) {
+      const p = document.createElement('p');
+      p.className = 'field-error';
+      p.textContent = message;
+      wrapper.appendChild(p);
+    }
+    return true;
+  }
+
+  function showStatus(kind, text) {
+    statusBanner.className =
+      'mb-6 rounded-md border p-4 text-sm ' +
+      (kind === 'error' ? 'border-red-300 bg-red-50 text-red-800'
+                        : 'border-emerald-300 bg-emerald-50 text-emerald-800');
+    statusBanner.textContent = text;
+  }
+
+  /* ── Submit ──────────────────────────────────────────────────── */
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    clearErrors();
+
+    const apiToken = tokenInput.value.trim();
+    if (!apiToken) {
+      tokenInput.focus();
+      showStatus('error', 'Please paste your API token first.');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    submitStatus.textContent = 'Generating…';
+
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + apiToken
+        },
+        body: JSON.stringify(buildPayload())
+      });
+
+      if (response.ok) {
+        // Success: stream the XRechnung XML back to the user as a download.
+        const xml = await response.text();
+        const blob = new Blob([xml], { type: 'application/xml' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download =
+          (form.querySelector('[name="invoiceNumber"]').value || 'invoice') + '.xml';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(a.href);
+        submitStatus.textContent = '';
+        showStatus('ok', 'Invoice downloaded. Open the XML to verify.');
+        return;
+      }
+
+      // Error path. The API returns RFC 7807 Problem Details JSON, with
+      // an `errorCode` and (for validation errors) an `errors` array of
+      // findings. Each finding has `fields: ['seller.name', ...]` plus a
+      // human-readable `message`.
+      const problem = await response.json().catch(() => ({}));
+      handleApiError(response.status, problem);
+
+    } catch (err) {
+      showStatus('error', 'Network error: ' + (err.message || err));
+    } finally {
+      submitBtn.disabled = false;
+      submitStatus.textContent = '';
+    }
+  });
+
+  function handleApiError(httpStatus, problem) {
+    const code = problem.errorCode;
+
+    // 4001 = Schematron rule violation, 4002 = model validation.
+    // Both shapes are identical: problem.errors is an array of findings.
+    if ((code === 4001 || code === 4002) && Array.isArray(problem.errors)) {
+      errorBanner.classList.remove('hidden');
+      problem.errors.forEach(finding => {
+        const li = document.createElement('li');
+        li.textContent = finding.message || 'Validation error';
+        errorList.appendChild(li);
+
+        // Highlight every input the finding points at.
+        if (Array.isArray(finding.fields)) {
+          finding.fields.forEach(path => markFieldError(path, finding.message));
+        }
+      });
+
+      // Scroll the first marked field into view so the user sees it.
+      const firstBad = form.querySelector('.field.has-error input');
+      if (firstBad) firstBad.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+
+    // Auth / quota / server errors: just show the title + detail.
+    const title = problem.title || ('HTTP ' + httpStatus);
+    const detail = problem.detail || 'Request failed.';
+    showStatus('error', title + ': ' + detail);
+  }
+})();
+</script>
+
+</body>
+</html>
