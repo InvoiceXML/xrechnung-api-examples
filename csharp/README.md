@@ -37,6 +37,7 @@ If you prefer plain `HttpClient` over Flurl, every example translates directly. 
 | [`Validate.cs`](./Validate.cs) | Validate an XRechnung file against the KoSIT rules | [`POST /v1/validate/xrechnung`](https://www.invoicexml.com/docs/api/validate/xrechnung) |
 | [`ExtractJson.cs`](./ExtractJson.cs) | Parse an XRechnung XML into JSON | [`POST /v1/extract/json`](https://www.invoicexml.com/docs/api/extract/json) |
 | [`AiConvert.cs`](./AiConvert.cs) | (Experimental) Convert a plain PDF to XRechnung with AI | [`POST /v1/transform/to/xrechnung`](https://www.invoicexml.com/docs/api/transform/to/xrechnung) |
+| [`Render.cs`](./Render.cs) | Render XRechnung XML into a human-readable PDF | [`POST /v1/render/xrechnung/to/pdf`](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf) |
 
 > **Note on the snippets below:** they are excerpts from those files and assume an `apiKey` variable is already defined and that the code runs inside an `async` method. The full files show the complete, compilable versions.
 
@@ -136,7 +137,7 @@ var json = await "https://api.invoicexml.com/v1/extract/json"
 await File.WriteAllTextAsync("invoice.json", json);
 ```
 
-[Full example: `ExtractJson.cs`](./ExtractJson.cs) | [API reference](https://www.invoicexml.com/docs/api/extract/json)
+[Full example: `ExtractJson.cs`](./ExtractJson.cs) | [API reference](https://www.invoicexml.com/docs/api/extract/json) | [Sample response](../json/extract-json-response.json)
 
 ---
 
@@ -165,6 +166,28 @@ await File.WriteAllTextAsync("converted-xrechnung.xml", xml);
 ```
 
 [Full example: `AiConvert.cs`](./AiConvert.cs) | [API reference](https://www.invoicexml.com/docs/api/transform/to/xrechnung)
+
+---
+
+## Render XRechnung as a readable PDF in C#
+
+XRechnung has no visual layer: the XML *is* the invoice, which is fine for machines and useless for the person in accounts payable who wants to read it. This endpoint renders the XML into a formatted PDF preview, auto-detecting whether the file is CII or UBL syntax. The PDF is for reading only; the XML file remains the authoritative invoice for compliance and tax purposes.
+
+```csharp
+using Flurl.Http;
+
+var pdfBytes = await "https://api.invoicexml.com/v1/render/xrechnung/to/pdf"
+    .WithOAuthBearerToken(apiKey)
+    .PostMultipartAsync(mp => mp
+        .AddFile("file", "invoice.xml", "application/xml")
+        .AddString("language", "de")   // en, de, or fr
+    )
+    .ReceiveBytes();
+
+await File.WriteAllBytesAsync("invoice-preview.pdf", pdfBytes);
+```
+
+[Full example: `Render.cs`](./Render.cs) | [API reference](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf)
 
 ---
 

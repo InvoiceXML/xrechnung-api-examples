@@ -33,6 +33,7 @@ The examples use Node's built-in global `fetch`, `FormData`, `Blob`, and `Buffer
 | [`validate.js`](./validate.js) | Validate an XRechnung file against the KoSIT rules | [`POST /v1/validate/xrechnung`](https://www.invoicexml.com/docs/api/validate/xrechnung) |
 | [`extract-json.js`](./extract-json.js) | Parse an XRechnung XML into JSON | [`POST /v1/extract/json`](https://www.invoicexml.com/docs/api/extract/json) |
 | [`ai-convert.js`](./ai-convert.js) | (Experimental) Convert a plain PDF to XRechnung with AI | [`POST /v1/transform/to/xrechnung`](https://www.invoicexml.com/docs/api/transform/to/xrechnung) |
+| [`render.js`](./render.js) | Render XRechnung XML into a human-readable PDF | [`POST /v1/render/xrechnung/to/pdf`](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf) |
 
 Each file is standalone and runnable with `node create.js`. Open the file, replace `YOUR_API_KEY` with your real key, and execute.
 
@@ -132,12 +133,12 @@ const response = await fetch('https://api.invoicexml.com/v1/extract/json', {
     body: form,
 });
 
-const invoice = await response.json();
-// The invoice fields sit at the root of the response.
+const { invoice } = await response.json();
+// The invoice document sits under the "invoice" key of the response.
 console.log(invoice.seller.name, invoice.totals.grandTotalAmount);
 ```
 
-[Full example: `extract-json.js`](./extract-json.js) | [API reference](https://www.invoicexml.com/docs/api/extract/json)
+[Full example: `extract-json.js`](./extract-json.js) | [API reference](https://www.invoicexml.com/docs/api/extract/json) | [Sample response](../json/extract-json-response.json)
 
 ---
 
@@ -152,6 +153,30 @@ console.log(invoice.seller.name, invoice.totals.grandTotalAmount);
 The endpoint takes the PDF plus a `buyerReference` form field: the Leitweg-ID cannot be inferred from the source document, so you must supply it.
 
 [Full example: `ai-convert.js`](./ai-convert.js) | [API reference](https://www.invoicexml.com/docs/api/transform/to/xrechnung)
+
+---
+
+## Render XRechnung as a readable PDF in Node.js
+
+XRechnung has no visual layer: the XML *is* the invoice, which is fine for machines and useless for the person in accounts payable who wants to read it. This endpoint renders the XML into a formatted PDF preview, auto-detecting whether the file is CII or UBL syntax. The PDF is for reading only; the XML file remains the authoritative invoice for compliance and tax purposes.
+
+```js
+const fs = require('fs');
+
+const form = new FormData();
+form.append('file', new Blob([fs.readFileSync('invoice.xml')], { type: 'application/xml' }), 'invoice.xml');
+form.append('language', 'de');   // en, de, or fr
+
+const response = await fetch('https://api.invoicexml.com/v1/render/xrechnung/to/pdf', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + apiKey },
+    body: form,
+});
+
+fs.writeFileSync('invoice-preview.pdf', Buffer.from(await response.arrayBuffer()));
+```
+
+[Full example: `render.js`](./render.js) | [API reference](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf)
 
 ---
 

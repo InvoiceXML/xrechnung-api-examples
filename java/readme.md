@@ -49,6 +49,7 @@ OkHttp is the de facto standard HTTP client for modern Java. Java's built-in `ja
 | [`Validate.java`](./Validate.java) | Validate an XRechnung file against the KoSIT rules | [`POST /v1/validate/xrechnung`](https://www.invoicexml.com/docs/api/validate/xrechnung) |
 | [`ExtractJson.java`](./ExtractJson.java) | Parse an XRechnung XML into JSON | [`POST /v1/extract/json`](https://www.invoicexml.com/docs/api/extract/json) |
 | [`AiConvert.java`](./AiConvert.java) | (Experimental) Convert a plain PDF to XRechnung with AI | [`POST /v1/transform/to/xrechnung`](https://www.invoicexml.com/docs/api/transform/to/xrechnung) |
+| [`Render.java`](./Render.java) | Render XRechnung XML into a human-readable PDF | [`POST /v1/render/xrechnung/to/pdf`](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf) |
 
 Each file is a standalone `public class` with a `main` method, runnable with `javac` and `java` directly, or as part of any Maven or Gradle project.
 
@@ -158,11 +159,11 @@ try (Response response = new OkHttpClient().newCall(
     ).execute()) {
     String json = response.body().string();
     // Deserialize with Jackson, Gson, or your preferred JSON library.
-    // The invoice fields sit at the root: seller, buyer, lines, totals.
+    // The invoice document sits under the "invoice" key: seller, buyer, lines, totals.
 }
 ```
 
-[Full example: `ExtractJson.java`](./ExtractJson.java) | [API reference](https://www.invoicexml.com/docs/api/extract/json)
+[Full example: `ExtractJson.java`](./ExtractJson.java) | [API reference](https://www.invoicexml.com/docs/api/extract/json) | [Sample response](../json/extract-json-response.json)
 
 ---
 
@@ -177,6 +178,33 @@ try (Response response = new OkHttpClient().newCall(
 The endpoint takes the PDF plus a `buyerReference` form field: the Leitweg-ID cannot be inferred from the source document, so you must supply it.
 
 [Full example: `AiConvert.java`](./AiConvert.java) | [API reference](https://www.invoicexml.com/docs/api/transform/to/xrechnung)
+
+---
+
+## Render XRechnung as a readable PDF in Java
+
+XRechnung has no visual layer: the XML *is* the invoice, which is fine for machines and useless for the person in accounts payable who wants to read it. This endpoint renders the XML into a formatted PDF preview, auto-detecting whether the file is CII or UBL syntax. The PDF is for reading only; the XML file remains the authoritative invoice for compliance and tax purposes.
+
+```java
+RequestBody body = new MultipartBody.Builder()
+    .setType(MultipartBody.FORM)
+    .addFormDataPart("file", "invoice.xml",
+        RequestBody.create(new File("invoice.xml"), MediaType.parse("application/xml")))
+    .addFormDataPart("language", "de")   // en, de, or fr
+    .build();
+
+Request request = new Request.Builder()
+    .url("https://api.invoicexml.com/v1/render/xrechnung/to/pdf")
+    .header("Authorization", "Bearer " + apiKey)
+    .post(body)
+    .build();
+
+try (Response response = new OkHttpClient().newCall(request).execute()) {
+    Files.write(Paths.get("invoice-preview.pdf"), response.body().bytes());
+}
+```
+
+[Full example: `Render.java`](./Render.java) | [API reference](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf)
 
 ---
 

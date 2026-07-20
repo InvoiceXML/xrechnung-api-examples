@@ -31,9 +31,9 @@ public static class ExtractJson
 
         try
         {
-            // POST the XML and receive a JSON document containing the parsed
-            // EN 16931 invoice fields (seller, buyer, lines, tax breakdown, totals)
-            // at the root of the response. Response schema:
+            // POST the XML and receive a JSON response with the parsed EN 16931
+            // invoice document (seller, buyer, lines, tax breakdown, totals)
+            // under the "invoice" key. Response schema:
             // https://www.invoicexml.com/docs/api/extract/json
             var json = await Endpoint
                 .WithOAuthBearerToken(apiKey)

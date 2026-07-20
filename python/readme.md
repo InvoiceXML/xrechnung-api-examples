@@ -43,6 +43,7 @@ uv pip install requests
 | [`validate.py`](./validate.py) | Validate an XRechnung file against the KoSIT rules | [`POST /v1/validate/xrechnung`](https://www.invoicexml.com/docs/api/validate/xrechnung) |
 | [`extract_json.py`](./extract_json.py) | Parse an XRechnung XML into JSON | [`POST /v1/extract/json`](https://www.invoicexml.com/docs/api/extract/json) |
 | [`ai_convert.py`](./ai_convert.py) | (Experimental) Convert a plain PDF to XRechnung with AI | [`POST /v1/transform/to/xrechnung`](https://www.invoicexml.com/docs/api/transform/to/xrechnung) |
+| [`render.py`](./render.py) | Render XRechnung XML into a human-readable PDF | [`POST /v1/render/xrechnung/to/pdf`](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf) |
 
 Each file is standalone and runnable with `python create.py`. Open the file, replace `YOUR_API_KEY` with your real key, and execute.
 
@@ -135,12 +136,12 @@ response = requests.post(
     files={"file": ("invoice.xml", open("invoice.xml", "rb"), "application/xml")},
 )
 
-invoice = response.json()
-# The invoice fields sit at the root of the response.
+# The invoice document sits under the "invoice" key of the response.
+invoice = response.json()["invoice"]
 print(invoice["seller"]["name"], invoice["totals"]["grandTotalAmount"])
 ```
 
-[Full example: `extract_json.py`](./extract_json.py) | [API reference](https://www.invoicexml.com/docs/api/extract/json)
+[Full example: `extract_json.py`](./extract_json.py) | [API reference](https://www.invoicexml.com/docs/api/extract/json) | [Sample response](../json/extract-json-response.json)
 
 ---
 
@@ -169,6 +170,28 @@ with open("converted-xrechnung.xml", "w", encoding="utf-8") as f:
 ```
 
 [Full example: `ai_convert.py`](./ai_convert.py) | [API reference](https://www.invoicexml.com/docs/api/transform/to/xrechnung)
+
+---
+
+## Render XRechnung as a readable PDF in Python
+
+XRechnung has no visual layer: the XML *is* the invoice, which is fine for machines and useless for the person in accounts payable who wants to read it. This endpoint renders the XML into a formatted PDF preview, auto-detecting whether the file is CII or UBL syntax. The PDF is for reading only; the XML file remains the authoritative invoice for compliance and tax purposes.
+
+```python
+import requests
+
+response = requests.post(
+    "https://api.invoicexml.com/v1/render/xrechnung/to/pdf",
+    headers={"Authorization": f"Bearer {api_key}"},
+    files={"file": ("invoice.xml", open("invoice.xml", "rb"), "application/xml")},
+    data={"language": "de"},   # en, de, or fr
+)
+
+with open("invoice-preview.pdf", "wb") as f:
+    f.write(response.content)
+```
+
+[Full example: `render.py`](./render.py) | [API reference](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf)
 
 ---
 

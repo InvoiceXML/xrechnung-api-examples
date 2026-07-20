@@ -1,0 +1,251 @@
+{
+  "invoice": {
+    "invoiceNumber": "INV-2026-0042",
+    "issueDate": "2026-06-14",
+    "dueDate": "2026-07-14",
+    "typeCode": "380",
+    "currency": "EUR",
+    "taxCurrency": null,
+    "specificationId": "urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0",
+    "businessProcessType": "urn:fdc:peppol.eu:2017:poacc:billing:01:1.0",
+    "buyerReference": "04011000-12345-67",
+    "purchaseOrderReference": "PO-2026-5571",
+    "notes": [
+      "Thank you for your business.",
+      "Goods delivered to the Lyon warehouse during May 2026."
+    ],
+    "vatPointDateCode": "3",
+    "supportingDocuments": [
+      {
+        "reference": "TIMESHEET-2026-05",
+        "schemeId": null,
+        "documentTypeCode": "916",
+        "description": "Signed timesheet for May 2026",
+        "externalUri": "https://docs.example.com/timesheets/2026-05.pdf",
+        "attachment": "JVBERi0xLjcK",
+        "attachmentMimeCode": "application/pdf",
+        "attachmentFilename": "timesheet-2026-05.pdf"
+      }
+    ],
+    "precedingInvoiceReferences": [
+      { "reference": "INV-2026-0031", "issueDate": "2026-05-02" }
+    ],
+    "seller": {
+      "name": "Muster Lieferant GmbH",
+      "tradingName": "Muster Supplies",
+      "postalAddress": {
+        "line1": "Lieferantenstrasse 20",
+        "line2": "Gebaeude 4",
+        "line3": "Etage 3",
+        "city": "Berlin",
+        "postCode": "10115",
+        "countrySubdivision": "Berlin",
+        "country": "DE"
+      },
+      "contact": {
+        "name": "Max Mustermann",
+        "phone": "+49 30 1234567",
+        "email": "billing@muster-lieferant.de"
+      },
+      "identifiers": [
+        { "identifier": "4000001000005", "schemeId": "0088" }
+      ],
+      "legalRegistration": { "identifier": "HRB 12345", "schemeId": "0002" },
+      "vatIdentifier": "DE123456789",
+      "taxRegistrationIdentifier": "201/123/12345",
+      "additionalLegalInformation": "Geschaeftsfuehrer: Max Mustermann. Amtsgericht Berlin HRB 12345.",
+      "electronicAddress": { "identifier": "DE123456789", "schemeId": "9930" }
+    },
+    "buyer": {
+      "name": "Client Acheteur SARL",
+      "tradingName": "Acheteur Retail",
+      "postalAddress": {
+        "line1": "12 Rue de l'Acheteur",
+        "line2": "Batiment B",
+        "line3": "Bureau 210",
+        "city": "Lyon",
+        "postCode": "69002",
+        "countrySubdivision": "Auvergne-Rhone-Alpes",
+        "country": "FR"
+      },
+      "contact": {
+        "name": "Marie Durand",
+        "phone": "+33 4 78 00 00 00",
+        "email": "ap@acheteur.fr"
+      },
+      "identifiers": [
+        { "identifier": "3000002000003", "schemeId": "0088" }
+      ],
+      "legalRegistration": { "identifier": "303 265 045", "schemeId": "0002" },
+      "vatIdentifier": "FR40303265045",
+      "electronicAddress": { "identifier": "FR40303265045", "schemeId": "9957" }
+    },
+    "delivery": {
+      "receiverName": "Acheteur Warehouse Lyon",
+      "locationIdentifier": "3000002000010",
+      "actualDeliveryDate": "2026-05-30",
+      "deliveryAddress": {
+        "line1": "5 Avenue de la Logistique",
+        "line2": "Quai 7",
+        "line3": "Zone C",
+        "city": "Venissieux",
+        "postCode": "69200",
+        "countrySubdivision": "Auvergne-Rhone-Alpes",
+        "country": "FR"
+      }
+    },
+    "invoicingPeriod": {
+      "startDate": "2026-05-01",
+      "endDate": "2026-05-31"
+    },
+    "paymentDetails": {
+      "paymentMeansCode": "58",
+      "paymentMeansText": "SEPA credit transfer to the main account",
+      "remittanceInformation": "INV-2026-0042",
+      "paymentAccountIdentifier": "DE89370400440532013000",
+      "paymentAccountName": "Muster Lieferant GmbH",
+      "bic": "COBADEFFXXX",
+      "mandateReference": "MNDT-2026-0042",
+      "paymentTerms": "Payment within 30 days net. 2% discount if paid within 10 days."
+    },
+    "totals": {
+      "sumOfLineNetAmounts": 975.00,
+      "sumOfAllowances": 15.00,
+      "sumOfCharges": 30.00,
+      "taxBasisTotalAmount": 990.00,
+      "taxTotalAmount": 176.10,
+      "taxTotalAmountInAccountingCurrency": null,
+      "grandTotalAmount": 1166.10,
+      "paidAmount": 100.00,
+      "roundingAmount": 0.00,
+      "duePayableAmount": 1066.10
+    },
+    "vatBreakdowns": [
+      {
+        "taxableAmount": 890.00,
+        "taxAmount": 169.10,
+        "categoryCode": "S",
+        "rate": 19,
+        "exemptionReasonText": null,
+        "exemptionReasonCode": null
+      },
+      {
+        "taxableAmount": 100.00,
+        "taxAmount": 7.00,
+        "categoryCode": "S",
+        "rate": 7,
+        "exemptionReasonText": null,
+        "exemptionReasonCode": null
+      }
+    ],
+    "lines": [
+      {
+        "lineId": "1",
+        "lineNote": "Includes 12-month standard warranty.",
+        "objectIdentifier": { "identifier": "OBJ-AB-001", "schemeId": "AAJ" },
+        "quantity": 10,
+        "unitCode": "C62",
+        "lineNetAmount": 875.00,
+        "buyerOrderLineReference": "PO-2026-5571-1",
+        "lineBuyerAccountingReference": "COSTCENTER-4711",
+        "linePeriod": { "startDate": "2026-05-01", "endDate": "2026-05-31" },
+        "priceDetails": {
+          "netPrice": 90.00,
+          "discountAmount": 10.00,
+          "grossPrice": 100.00,
+          "priceBaseQuantity": 1,
+          "priceBaseUnit": "C62"
+        },
+        "vatInformation": { "categoryCode": "S", "rate": 19 },
+        "item": {
+          "name": "Ergonomic office chair",
+          "description": "Adjustable ergonomic office chair, black mesh back.",
+          "sellerIdentifier": "CHAIR-ERGO-BLK",
+          "buyerIdentifier": "BUY-CHR-001",
+          "standardIdentifier": { "identifier": "4012345000009", "schemeId": "0160" },
+          "classifications": [
+            { "identifier": "56101700", "schemeId": "STI", "schemeVersion": "26.0801" }
+          ],
+          "attributes": [
+            { "name": "Colour", "value": "Black" },
+            { "name": "Backrest", "value": "Mesh" }
+          ],
+          "countryOfOrigin": "DE"
+        },
+        "allowances": [
+          {
+            "amount": 50.00,
+            "baseAmount": 1000.00,
+            "percentage": 5,
+            "reason": "Volume discount",
+            "reasonCode": "95"
+          }
+        ],
+        "charges": [
+          {
+            "amount": 25.00,
+            "baseAmount": 1000.00,
+            "percentage": 2.5,
+            "reason": "Handling and packaging",
+            "reasonCode": "FC"
+          }
+        ]
+      },
+      {
+        "lineId": "2",
+        "lineNote": "Reduced-rate consumable.",
+        "objectIdentifier": { "identifier": "OBJ-AB-002", "schemeId": "AAJ" },
+        "quantity": 5,
+        "unitCode": "C62",
+        "lineNetAmount": 100.00,
+        "buyerOrderLineReference": "PO-2026-5571-2",
+        "lineBuyerAccountingReference": "COSTCENTER-4712",
+        "linePeriod": { "startDate": "2026-05-01", "endDate": "2026-05-31" },
+        "priceDetails": {
+          "netPrice": 20.00,
+          "discountAmount": 5.00,
+          "grossPrice": 25.00,
+          "priceBaseQuantity": 1,
+          "priceBaseUnit": "C62"
+        },
+        "vatInformation": { "categoryCode": "S", "rate": 7 },
+        "item": {
+          "name": "Printed product catalogue",
+          "description": "Full-colour A4 product catalogue, 120 pages.",
+          "sellerIdentifier": "CAT-2026",
+          "buyerIdentifier": "BUY-CAT-002",
+          "standardIdentifier": { "identifier": "4012345000160", "schemeId": "0160" },
+          "classifications": [
+            { "identifier": "55101500", "schemeId": "STI", "schemeVersion": "26.0801" }
+          ],
+          "attributes": [],
+          "countryOfOrigin": "DE"
+        },
+        "allowances": [],
+        "charges": []
+      }
+    ],
+    "allowances": [
+      {
+        "amount": 15.00,
+        "baseAmount": 300.00,
+        "percentage": 5,
+        "vatCategoryCode": "S",
+        "vatRate": 19,
+        "reason": "Loyalty rebate",
+        "reasonCode": "100"
+      }
+    ],
+    "charges": [
+      {
+        "amount": 30.00,
+        "baseAmount": 600.00,
+        "percentage": 5,
+        "vatCategoryCode": "S",
+        "vatRate": 19,
+        "reason": "Freight",
+        "reasonCode": "FC"
+      }
+    ]
+  }
+}

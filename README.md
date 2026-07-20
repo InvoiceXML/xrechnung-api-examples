@@ -26,6 +26,7 @@ The EN 16931 specification alone runs over 400 pages, the XRechnung CIUS layers 
   - [Create and validate XRechnung with Node.js](#create-and-validate-xrechnung-with-nodejs)
   - [Create and validate XRechnung with Python](#create-and-validate-xrechnung-with-python)
 - [Parse XRechnung data as JSON](#parse-xrechnung-data-as-json)
+- [Render XRechnung as a readable PDF](#render-xrechnung-as-a-readable-pdf)
 - [AI-powered PDF to XRechnung conversion (Experimental)](#ai-powered-pdf-to-xrechnung-conversion-experimental)
 - [XRechnung syntax, versions, and validation](#xrechnung-syntax-versions-and-validation)
 - [Related e-invoicing standards](#related-e-invoicing-standards)
@@ -80,6 +81,7 @@ Every example in this repository produces or consumes invoices that conform to t
 | **[Create XRechnung](https://www.invoicexml.com/docs/api/create/xrechnung)** | Build an XRechnung 3.0 XML invoice from a structured JSON request |
 | **[Validate XRechnung](https://www.invoicexml.com/docs/api/validate/xrechnung)** | Verify an XRechnung file against the XSD, the EN 16931 Schematron, and the KoSIT BR-DE rules |
 | **[Extract JSON](https://www.invoicexml.com/docs/api/extract/json)** | Parse an XRechnung XML file into structured invoice data as JSON for downstream systems |
+| **[Render to PDF](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf)** | Render an XRechnung XML file into a human-readable PDF preview |
 | **[AI Convert](https://www.invoicexml.com/docs/api/transform/to/xrechnung)** *(experimental)* | Convert a plain, unstructured PDF invoice into a compliant XRechnung document using a large language model |
 
 > **Looking for hybrid PDF invoices?** XRechnung is pure XML. If you need a PDF/A-3 with embedded XML for B2B exchange, see the [ZUGFeRD examples](https://github.com/InvoiceXML/zugferd-api-examples) (Germany) or the [Factur-X examples](https://github.com/InvoiceXML/facturx-api-examples) (France).
@@ -110,6 +112,7 @@ Each language has its own folder containing all four operations as standalone, r
   Validate.java
   ExtractJson.java
   AiConvert.java
+  Render.java
 ```
 
 [Open the Java examples →](./java)
@@ -122,6 +125,7 @@ Each language has its own folder containing all four operations as standalone, r
   validate.php
   extract-json.php
   ai-convert.php
+  render.php
 ```
 
 [Open the PHP examples →](./php)
@@ -136,6 +140,7 @@ Browser-side examples for generating and inspecting XRechnung invoices client-si
   validate.html
   extract-json.html
   ai-convert.html
+  render.html
 ```
 
 [Open the JavaScript examples →](./javascript)
@@ -148,6 +153,7 @@ Browser-side examples for generating and inspecting XRechnung invoices client-si
   validate.js
   extract-json.js
   ai-convert.js
+  render.js
 ```
 
 [Open the Node.js examples →](./nodejs)
@@ -160,6 +166,7 @@ Browser-side examples for generating and inspecting XRechnung invoices client-si
   validate.py
   extract_json.py
   ai_convert.py
+  render.py
 ```
 
 [Open the Python examples →](./python)
@@ -170,9 +177,22 @@ Browser-side examples for generating and inspecting XRechnung invoices client-si
 
 Many downstream systems (ERPs, accounting software, expense management tools) work natively with JSON rather than XML. The `ExtractJson` examples in every language upload an XRechnung XML file and receive the EN 16931 model back as clean JSON: seller, buyer, line items, tax breakdown, totals, and payment details.
 
-The invoice fields sit at the **root** of the response, so you read `seller.name` or `totals.grandTotalAmount` (BT-112) directly, with no wrapper object to unpack.
+The invoice document sits under the **`invoice`** key of the response, so you read `invoice.seller.name` or `invoice.totals.grandTotalAmount` (BT-112). A complete sample response with every field of the invoice model populated is in [json/extract-json-response.json](./json/extract-json-response.json); optional fields that are absent from the source document come back as `null` (empty arrays for lists).
 
 This is the fastest way to get invoice data out of an XRechnung file and into a modern data pipeline.
+
+---
+
+## Render XRechnung as a readable PDF
+
+XRechnung has no visual layer: the XML *is* the invoice. That is fine for machines and useless for the person in accounts payable who needs to look at it, which is the most common complaint from teams switching to XRechnung from PDF invoicing.
+
+The `Render` examples upload an XRechnung XML file and receive a formatted PDF preview, with every EN 16931 business term mapped to a readable layout. The syntax is auto-detected, so both CII and UBL XRechnung files render correctly, and the labels can be localized with the `language` field (`en`, `de`, `fr`).
+
+Two things worth knowing:
+
+- **The PDF has no legal standing.** It is a visual representation for humans; the XML file remains the authoritative invoice for compliance and tax purposes. If you need a legally exchangeable PDF with the data embedded, you want [ZUGFeRD](https://github.com/InvoiceXML/zugferd-api-examples) instead.
+- **Rendering is not validation.** A retired XRechnung 2.x file still renders. Use `POST /v1/validate/xrechnung` to check compliance.
 
 ---
 

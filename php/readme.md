@@ -34,6 +34,7 @@ These examples use the built-in `curl_*` functions and `CURLFile` (available sin
 | [`validate.php`](./validate.php) | Validate an XRechnung file against the KoSIT rules | [`POST /v1/validate/xrechnung`](https://www.invoicexml.com/docs/api/validate/xrechnung) |
 | [`extract-json.php`](./extract-json.php) | Parse an XRechnung XML into JSON | [`POST /v1/extract/json`](https://www.invoicexml.com/docs/api/extract/json) |
 | [`ai-convert.php`](./ai-convert.php) | (Experimental) Convert a plain PDF to XRechnung with AI | [`POST /v1/transform/to/xrechnung`](https://www.invoicexml.com/docs/api/transform/to/xrechnung) |
+| [`render.php`](./render.php) | Render XRechnung XML into a human-readable PDF | [`POST /v1/render/xrechnung/to/pdf`](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf) |
 
 Each file is standalone and runnable with `php create.php`. Open the file, replace `YOUR_API_KEY` with your real key, and execute.
 
@@ -132,11 +133,11 @@ curl_setopt_array($ch, [
 ]);
 $json = curl_exec($ch);
 $data = json_decode($json, true);
-// The invoice fields sit at the root of the response.
-echo $data['seller']['name'];
+// The invoice document sits under the "invoice" key of the response.
+echo $data['invoice']['seller']['name'];
 ```
 
-[Full example: `extract-json.php`](./extract-json.php) | [API reference](https://www.invoicexml.com/docs/api/extract/json)
+[Full example: `extract-json.php`](./extract-json.php) | [API reference](https://www.invoicexml.com/docs/api/extract/json) | [Sample response](../json/extract-json-response.json)
 
 ---
 
@@ -168,6 +169,29 @@ file_put_contents('converted-xrechnung.xml', $xml);
 ```
 
 [Full example: `ai-convert.php`](./ai-convert.php) | [API reference](https://www.invoicexml.com/docs/api/transform/to/xrechnung)
+
+---
+
+## Render XRechnung as a readable PDF in PHP
+
+XRechnung has no visual layer: the XML *is* the invoice, which is fine for machines and useless for the person in accounts payable who wants to read it. This endpoint renders the XML into a formatted PDF preview, auto-detecting whether the file is CII or UBL syntax. The PDF is for reading only; the XML file remains the authoritative invoice for compliance and tax purposes.
+
+```php
+$ch = curl_init('https://api.invoicexml.com/v1/render/xrechnung/to/pdf');
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST           => true,
+    CURLOPT_POSTFIELDS     => [
+        'file'     => new CURLFile('invoice.xml', 'application/xml'),
+        'language' => 'de',   // en, de, or fr
+    ],
+    CURLOPT_HTTPHEADER     => ['Authorization: Bearer ' . $apiKey],
+]);
+$pdf = curl_exec($ch);
+file_put_contents('invoice-preview.pdf', $pdf);
+```
+
+[Full example: `render.php`](./render.php) | [API reference](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf)
 
 ---
 

@@ -42,6 +42,7 @@ Set `apiKey` in the examples to the raw key only, without the `Bearer ` prefix. 
 | [`validate.html`](./validate.html) | Validate an XRechnung file against the KoSIT rules | [`POST /v1/validate/xrechnung`](https://www.invoicexml.com/docs/api/validate/xrechnung) |
 | [`extract-json.html`](./extract-json.html) | Parse an XRechnung XML into JSON | [`POST /v1/extract/json`](https://www.invoicexml.com/docs/api/extract/json) |
 | [`ai-convert.html`](./ai-convert.html) | (Experimental) Convert a plain PDF to XRechnung with AI | [`POST /v1/transform/to/xrechnung`](https://www.invoicexml.com/docs/api/transform/to/xrechnung) |
+| [`render.html`](./render.html) | Render XRechnung XML into a human-readable PDF | [`POST /v1/render/xrechnung/to/pdf`](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf) |
 
 Each file is a complete, runnable HTML page. Open it in a browser, paste your API key into the `<script>` block, and click the button.
 
@@ -141,12 +142,12 @@ const response = await fetch('https://api.invoicexml.com/v1/extract/json', {
     headers: { Authorization: 'Bearer ' + apiKey },
     body: form,
 });
-const invoice = await response.json();
-// The invoice fields sit at the root of the response.
+const { invoice } = await response.json();
+// The invoice document sits under the "invoice" key of the response.
 console.log(invoice.seller.name, invoice.totals.grandTotalAmount);
 ```
 
-[Full example: `extract-json.html`](./extract-json.html) | [API reference](https://www.invoicexml.com/docs/api/extract/json)
+[Full example: `extract-json.html`](./extract-json.html) | [API reference](https://www.invoicexml.com/docs/api/extract/json) | [Sample response](../json/extract-json-response.json)
 
 
 ---
@@ -158,6 +159,32 @@ console.log(invoice.seller.name, invoice.totals.grandTotalAmount);
 > AI extraction can make subtle mistakes that automated validators may not catch: wrong tax category codes, transposed amounts, missing seller VAT identifiers, incorrect currency formatting. Always review the output PDF before sending it to a customer or tax authority. See the [AI conversion notes in the main README](../README.md#ai-powered-pdf-to-xrechnung-conversion-experimental).
 
 [Full example: `ai-convert.html`](./ai-convert.html) | [API reference](https://www.invoicexml.com/docs/api/transform/to/xrechnung)
+
+---
+
+## Render XRechnung as a readable PDF in the browser
+
+XRechnung has no visual layer: the XML *is* the invoice, which is fine for machines and useless for the person in accounts payable who wants to read it. This endpoint renders the XML into a formatted PDF preview, auto-detecting whether the file is CII or UBL syntax. The PDF is for reading only; the XML file remains the authoritative invoice for compliance and tax purposes.
+
+```js
+const form = new FormData();
+form.append('file', fileInput.files[0]);
+form.append('language', 'de');   // en, de, or fr
+
+const response = await fetch('https://api.invoicexml.com/v1/render/xrechnung/to/pdf', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + apiKey },
+    body: form,
+});
+
+const blob = await response.blob();
+const a = document.createElement('a');
+a.href = URL.createObjectURL(blob);
+a.download = 'invoice-preview.pdf';
+a.click();
+```
+
+[Full example: `render.html`](./render.html) | [API reference](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf)
 
 ---
 
