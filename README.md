@@ -2,7 +2,7 @@
 
 Open-source code examples for working with **XRechnung**, the German national standard for electronic invoicing. XRechnung is a **standalone XML** document (not a PDF), defined as a CIUS (Core Invoice Usage Specification) of the European norm **EN 16931**, and it is mandatory for invoicing German public authorities.
 
-Examples in **C#, Java, PHP, JavaScript, Node.js, and Python** covering every common XRechnung operation: invoice creation, validation against the official KoSIT rules, parsing invoice data into JSON, and (experimental) AI-powered conversion of plain PDF invoices into compliant XRechnung documents.
+Examples in **C#, Java, PHP, JavaScript, Node.js, Python, and Ruby** covering every common XRechnung operation: invoice creation, validation against the official KoSIT rules, parsing invoice data into JSON, and (experimental) AI-powered conversion of plain PDF invoices into compliant XRechnung documents.
 
 Provided and maintained by [InvoiceXML](https://www.invoicexml.com), a complete e-invoice compliance toolkit for electronic invoicing standards, including XRechnung, ZUGFeRD, Factur-X, UBL, Peppol BIS Billing, and CII, available via REST-API, no-code platforms, and MCP server.
 
@@ -25,6 +25,7 @@ The EN 16931 specification alone runs over 400 pages, the XRechnung CIUS layers 
   - [Create and validate XRechnung with JavaScript in the browser](#create-and-validate-xrechnung-with-javascript-in-the-browser)
   - [Create and validate XRechnung with Node.js](#create-and-validate-xrechnung-with-nodejs)
   - [Create and validate XRechnung with Python](#create-and-validate-xrechnung-with-python)
+  - [Create and validate XRechnung with Ruby](#create-and-validate-xrechnung-with-ruby)
 - [Parse XRechnung data as JSON](#parse-xrechnung-data-as-json)
 - [Render XRechnung as a readable PDF](#render-xrechnung-as-a-readable-pdf)
 - [AI-powered PDF to XRechnung conversion (Experimental)](#ai-powered-pdf-to-xrechnung-conversion-experimental)
@@ -171,6 +172,22 @@ Browser-side examples for generating and inspecting XRechnung invoices client-si
 
 [Open the Python examples →](./python)
 
+### Create and validate XRechnung with Ruby
+
+Standard library only (`Net::HTTP`), no gems. The Ruby folder additionally covers AI parsing of old-school PDFs with confidence scores and embedded attachment extraction.
+
+```
+/ruby
+  create.rb
+  validate.rb
+  extract_json.rb
+  render.rb
+  parse_json.rb
+  extract_attachments.rb
+```
+
+[Open the Ruby examples →](./ruby)
+
 ---
 
 ## Parse XRechnung data as JSON
@@ -284,7 +301,7 @@ Via the Peppol network, or by uploading directly to the ZRE or OZG-RE portals fo
 
 Pull requests are welcome. Useful contributions include:
 
-- Additional languages (Go, Rust, Ruby, Kotlin, Swift)
+- Additional languages (Go, Rust, Kotlin, Swift)
 - Alternative library implementations in existing languages
 - Sample invoice fixtures covering edge cases (reverse charge, zero-rated supplies, credit notes, UBL syntax)
 - Translations of the README and inline comments
