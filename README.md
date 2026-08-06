@@ -239,11 +239,11 @@ XRechnung has no profile ladder of the kind ZUGFeRD and Factur-X use. There is o
 
 | Aspect | Detail |
 |---|---|
-| **Syntax** | **UBL 2.1** or **UN/CEFACT CII D16B**. Both are valid XRechnung; pick whichever your recipient or portal integration expects. The examples in this repository produce CII. |
+| **Syntax** | **UBL 2.1** or **UN/CEFACT CII D16B**. Both are valid XRechnung; pick whichever your recipient or portal integration expects via `options.syntax` (`ubl`, the default, or `cii`). The examples in this repository produce UBL. |
 | **Version** | **3.0**, in force since February 2024, declared as `urn:cen.eu:en16931:2017#compliant#urn:xeinkauf.de:kosit:xrechnung_3.0`. Documents declaring a retired 2.x identifier are no longer compliant and must be re-issued. |
 | **Validation** | Three layers: the XSD for the detected syntax, the EN 16931 core Schematron, and the German `BR-DE-*` rules from the KoSIT XRechnung Schematron, the same rules ZRE and OZG-RE enforce. |
 
-To create XRechnung in UBL syntax instead of CII, use [`POST /v1/create/ubl`](https://www.invoicexml.com/docs/api/create/ubl) with `options.profile` set to `xrechnung`.
+To create XRechnung in CII syntax instead of UBL, set `options.syntax` to `cii` in the same [`POST /v1/create/xrechnung`](https://www.invoicexml.com/docs/api/create/xrechnung) request.
 
 ---
 
@@ -276,7 +276,7 @@ Yes, for B2G. Rule BR-DE-15 requires it in the buyer reference (BT-10). The auth
 XRechnung 3.0, the version in force since February 2024, validated against the matching KoSIT rules before delivery.
 
 **UBL or CII: which syntax should I use?**
-Both are valid. These examples produce CII. Use whichever your recipient or portal integration expects; if you need UBL, call `/v1/create/ubl` with `options.profile` set to `xrechnung`.
+Both are valid. These examples produce UBL, the default. Use whichever your recipient or portal integration expects; if you need CII, set `options.syntax` to `cii` in the same request.
 
 **Is XRechnung mandatory for B2B invoicing in Germany?**
 The German B2B mandate (reception since January 2025, issuance phasing in from 2027) accepts any EN 16931 compliant format. XRechnung qualifies, but most B2B senders choose ZUGFeRD because it also gives the recipient a readable PDF. XRechnung's mandate is B2G.

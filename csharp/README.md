@@ -82,7 +82,7 @@ var payload = new
             }
         }
     },
-    options = new { version = "3.0" }
+    options = new { syntax = "ubl" }
 };
 
 var xml = await "https://api.invoicexml.com/v1/create/xrechnung"

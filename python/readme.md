@@ -83,7 +83,7 @@ payload = {
             "item":           {"name": "Senior consulting"},
         }],
     },
-    "options": {"version": "3.0"},
+    "options": {"syntax": "ubl"},
 }
 
 response = requests.post(

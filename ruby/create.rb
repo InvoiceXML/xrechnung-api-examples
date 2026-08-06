@@ -67,7 +67,7 @@ payload = {
       }
     ]
   },
-  options: { version: "3.0" }
+  options: { syntax: "ubl" }
 }
 
 uri = URI("#{BASE_URL}/v1/create/xrechnung")

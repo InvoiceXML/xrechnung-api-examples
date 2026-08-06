@@ -57,7 +57,7 @@ payload = {
             },
         ],
     },
-    "options": {"version": "3.0"},
+    "options": {"syntax": "ubl"},
 }
 
 response = requests.post(

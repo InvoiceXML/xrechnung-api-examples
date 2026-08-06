@@ -88,7 +88,7 @@ String json = """
           "item": { "name": "Senior consulting" }
         }]
       },
-      "options": { "version": "3.0" }
+      "options": { "syntax": "ubl" }
     }
     """;
 

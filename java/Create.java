@@ -61,7 +61,7 @@ public class Create {
                   }
                 ]
               },
-              "options": { "version": "3.0" }
+              "options": { "syntax": "ubl" }
             }
             """;
 

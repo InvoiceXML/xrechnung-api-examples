@@ -81,7 +81,7 @@ public static class CreateXRechnung
                     }
                 }
             },
-            options = new { version = "3.0" }
+            options = new { syntax = "ubl" }
         };
 
         try

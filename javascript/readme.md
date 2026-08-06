@@ -72,7 +72,7 @@ const payload = {
         lines: [{ quantity: 10, priceDetails: { netPrice: 150.00 },
                   vatInformation: { rate: 19.00 }, item: { name: 'Senior consulting' } }],
     },
-    options: { version: '3.0' },
+    options: { syntax: 'ubl' },
 };
 
 document.getElementById('run').addEventListener('click', async () => {

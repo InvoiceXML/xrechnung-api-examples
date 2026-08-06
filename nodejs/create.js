@@ -56,7 +56,7 @@ const payload = {
             },
         ],
     },
-    options: { version: '3.0' },
+    options: { syntax: 'ubl' },
 };
 
 (async () => {

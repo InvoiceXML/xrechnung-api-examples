@@ -108,7 +108,7 @@ payload = {
       { quantity: 10, priceDetails: { netPrice: 150.00 }, vatInformation: { rate: 19.00 }, item: { name: "Senior consulting" } }
     ]
   },
-  options: { version: "3.0" }
+  options: { syntax: "ubl" }
 }
 
 uri = URI("#{BASE_URL}/v1/create/xrechnung")
@@ -123,7 +123,7 @@ raise response.body unless response.is_a?(Net::HTTPSuccess)
 File.binwrite("invoice-xrechnung.xml", response.body)
 ```
 
-The response is XRechnung 3.0 in CII syntax, already checked against the EN 16931 Schematron and the KoSIT rules. XRechnung also permits a UBL binding, which matters if your stack serves the Peppol network as well: create it via `POST /v1/create/ubl` with `options: { profile: "xrechnung" }` and the same invoice hash. Both outputs are legally equivalent.
+The response is XRechnung 3.0 in UBL syntax, already checked against the EN 16931 Schematron and the KoSIT rules. XRechnung also permits a CII binding: request it via `options: { syntax: "cii" }` with the same invoice hash. Both outputs are legally equivalent.
 
 [Full example: `create.rb`](./create.rb) | [API reference](https://www.invoicexml.com/docs/api/create/xrechnung)
 
@@ -261,7 +261,7 @@ class XrechnungService
   def create(invoice_attributes)
     response = connection.post("/v1/create/xrechnung") do |req|
       req.headers["Content-Type"] = "application/json"
-      req.body = JSON.generate(invoice: invoice_attributes, options: { version: "3.0" })
+      req.body = JSON.generate(invoice: invoice_attributes, options: { syntax: "ubl" })
     end
     raise XrechnungError, response.body unless response.success?
     response.body

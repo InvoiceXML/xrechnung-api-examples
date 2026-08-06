@@ -71,7 +71,7 @@ const payload = {
             item:           { name: 'Senior consulting' },
         }],
     },
-    options: { version: '3.0' },
+    options: { syntax: 'ubl' },
 };
 
 const response = await fetch('https://api.invoicexml.com/v1/create/xrechnung', {

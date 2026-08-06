@@ -53,7 +53,7 @@ $payload = [
             ],
         ],
     ],
-    'options' => ['version' => '3.0'],
+    'options' => ['syntax' => 'ubl'],
 ];
 
 $ch = curl_init('https://api.invoicexml.com/v1/create/xrechnung');
