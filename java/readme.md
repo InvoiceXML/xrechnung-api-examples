@@ -4,6 +4,8 @@ Java code samples for creating, validating, and parsing **XRechnung** electronic
 
 For background on the XRechnung standard itself (what it is, the Leitweg-ID, legal status), see the [main repository README](../README.md).
 
+> **Using Spring Boot?** The examples in this folder use OkHttp. There is a parallel set written against Spring's own `RestClient`, so you do not have to add a second HTTP client to your dependency tree: **[Spring Boot examples →](./spring)**
+
 ## Get your API key
 
 Every example in this folder calls the InvoiceXML REST API. Sign up and generate a free API key here:
@@ -229,6 +231,8 @@ public class XRechnungController {
 ```
 
 Inject the API key from `application.properties` via `@Value("${invoicexml.api-key}")`.
+
+To drop OkHttp entirely and call the API through Spring's own `RestClient`, use the [Spring Boot examples](./spring) instead: an injectable client, a `@Configuration` bean with connection pooling, and the multipart filename detail that trips most first integrations.
 
 ### Quarkus
 

@@ -114,9 +114,15 @@ Each language has its own folder containing all four operations as standalone, r
   ExtractJson.java
   AiConvert.java
   Render.java
+  /spring
+    InvoiceXmlClient.java
+    XRechnungFlow.java
+    InvoiceXmlConfig.java
 ```
 
-[Open the Java examples →](./java)
+The files in `/java` use OkHttp. `/java/spring` has the same operations written against Spring's `RestClient`, for Spring Boot backends that would rather not add a second HTTP client.
+
+[Open the Java examples →](./java) | [Open the Spring Boot examples →](./java/spring)
 
 ### Create and validate XRechnung with PHP
 
