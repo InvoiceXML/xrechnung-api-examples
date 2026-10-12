@@ -48,7 +48,7 @@ XRechnung takes the EN 16931 core model and tightens it: the CIUS adds German bu
 
 Since **November 2020**, XRechnung has been mandatory for invoices sent to German federal authorities, with state and municipal authorities following on their own timelines. It is the format German B2G portals such as **ZRE** (Zentrale Rechnungseingangsplattform) and **OZG-RE** expect, and it is also routed over the **Peppol** network.
 
-For a longer introduction including history, versions, and legal status, see the [XRechnung overview guide on invoicexml.com](https://invoicexml.com/xrechnung).
+For a longer introduction including history, versions, and legal status, see the [XRechnung overview guide on invoicexml.com](https://www.invoicexml.com/xrechnung).
 
 ## The Leitweg-ID
 
@@ -263,7 +263,7 @@ XRechnung is one of several formats in the European e-invoicing landscape. If yo
 - **Peppol BIS Billing 3.0**: UBL-based subset exchanged over the Peppol network, the channel many German authorities receive XRechnung through.
 - **EN 16931**: the European norm that underlies XRechnung, ZUGFeRD, Factur-X, and Peppol BIS.
 
-For a side-by-side comparison of when to use which format, see the [e-invoicing standards comparison on invoicexml.com](https://invoicexml.com/standards).
+For a side-by-side comparison of when to use which format, see the [e-invoicing standards comparison on invoicexml.com](https://www.invoicexml.com/standards).
 
 ---
 
@@ -299,7 +299,7 @@ Via the Peppol network, or by uploading directly to the ZRE or OZG-RE portals fo
 - [Leitweg-ID guidance (KoSIT)](https://xeinkauf.de/leitweg-id/)
 - [EN 16931 (European Committee for Standardization)](https://www.cencenelec.eu/)
 - [Peppol BIS Billing 3.0](https://docs.peppol.eu/poacc/billing/3.0/)
-- [invoicexml.com](https://invoicexml.com): guides, tutorials, validators, and standard comparisons for XRechnung, ZUGFeRD, Factur-X, UBL, and Peppol
+- [invoicexml.com](https://www.invoicexml.com): guides, tutorials, validators, and standard comparisons for XRechnung, ZUGFeRD, Factur-X, UBL, and Peppol
 
 ---
 
