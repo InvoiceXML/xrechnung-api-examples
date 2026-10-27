@@ -144,7 +144,7 @@
         "lineNote": "Includes 12-month standard warranty.",
         "objectIdentifier": { "identifier": "OBJ-AB-001", "schemeId": "AAJ" },
         "quantity": 10,
-        "unitCode": "C62",
+        "unitCode": "H87",
         "lineNetAmount": 875.00,
         "buyerOrderLineReference": "PO-2026-5571-1",
         "lineBuyerAccountingReference": "COSTCENTER-4711",
@@ -154,7 +154,7 @@
           "discountAmount": 10.00,
           "grossPrice": 100.00,
           "priceBaseQuantity": 1,
-          "priceBaseUnit": "C62"
+          "priceBaseUnit": "H87"
         },
         "vatInformation": { "categoryCode": "S", "rate": 19 },
         "item": {
@@ -196,7 +196,7 @@
         "lineNote": "Reduced-rate consumable.",
         "objectIdentifier": { "identifier": "OBJ-AB-002", "schemeId": "AAJ" },
         "quantity": 5,
-        "unitCode": "C62",
+        "unitCode": "H87",
         "lineNetAmount": 100.00,
         "buyerOrderLineReference": "PO-2026-5571-2",
         "lineBuyerAccountingReference": "COSTCENTER-4712",
@@ -206,7 +206,7 @@
           "discountAmount": 5.00,
           "grossPrice": 25.00,
           "priceBaseQuantity": 1,
-          "priceBaseUnit": "C62"
+          "priceBaseUnit": "H87"
         },
         "vatInformation": { "categoryCode": "S", "rate": 7 },
         "item": {
