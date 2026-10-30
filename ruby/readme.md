@@ -44,6 +44,7 @@ There is a reason nothing here runs locally. No maintained XRechnung gem exists,
 | File | Operation | API endpoint |
 |---|---|---|
 | [`create.rb`](./create.rb) | Build an XRechnung 3.0 XML invoice | [`POST /v1/create/xrechnung`](https://www.invoicexml.com/docs/api/create/xrechnung) |
+| [`send_email.rb`](./send_email.rb) | Create an XRechnung invoice and email it from your own domain | [`POST /v1/create/xrechnung/email`](https://www.invoicexml.com/docs/api/create/xrechnung/email) |
 | [`validate.rb`](./validate.rb) | Validate against the XSD, EN 16931, and the KoSIT BR-DE rules | [`POST /v1/validate/xrechnung`](https://www.invoicexml.com/docs/api/validate/xrechnung) |
 | [`extract_json.rb`](./extract_json.rb) | Parse an XRechnung XML into JSON (deterministic, no AI) | [`POST /v1/extract/json`](https://www.invoicexml.com/docs/api/extract/json) |
 | [`render.rb`](./render.rb) | Render XRechnung XML into a human-readable PDF | [`POST /v1/render/xrechnung/to/pdf`](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf) |

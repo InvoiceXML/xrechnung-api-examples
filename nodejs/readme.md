@@ -30,6 +30,7 @@ The examples use Node's built-in global `fetch`, `FormData`, `Blob`, and `Buffer
 | File | Operation | API endpoint |
 |---|---|---|
 | [`create.js`](./create.js) | Build an XRechnung 3.0 XML invoice | [`POST /v1/create/xrechnung`](https://www.invoicexml.com/docs/api/create/xrechnung) |
+| [`send-email.js`](./send-email.js) | Create an XRechnung invoice and email it from your own domain | [`POST /v1/create/xrechnung/email`](https://www.invoicexml.com/docs/api/create/xrechnung/email) |
 | [`validate.js`](./validate.js) | Validate an XRechnung file against the KoSIT rules | [`POST /v1/validate/xrechnung`](https://www.invoicexml.com/docs/api/validate/xrechnung) |
 | [`extract-json.js`](./extract-json.js) | Parse an XRechnung XML into JSON | [`POST /v1/extract/json`](https://www.invoicexml.com/docs/api/extract/json) |
 | [`ai-convert.js`](./ai-convert.js) | (Experimental) Convert a plain PDF to XRechnung with AI | [`POST /v1/transform/to/xrechnung`](https://www.invoicexml.com/docs/api/transform/to/xrechnung) |

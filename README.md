@@ -27,6 +27,7 @@ The EN 16931 specification alone runs over 400 pages, the XRechnung CIUS layers 
   - [Create and validate XRechnung with Python](#create-and-validate-xrechnung-with-python)
   - [Create and validate XRechnung with Ruby](#create-and-validate-xrechnung-with-ruby)
 - [Parse XRechnung data as JSON](#parse-xrechnung-data-as-json)
+- [Send XRechnung invoices by email](#send-xrechnung-invoices-by-email)
 - [Render XRechnung as a readable PDF](#render-xrechnung-as-a-readable-pdf)
 - [AI-powered PDF to XRechnung conversion (Experimental)](#ai-powered-pdf-to-xrechnung-conversion-experimental)
 - [XRechnung syntax, versions, and validation](#xrechnung-syntax-versions-and-validation)
@@ -80,6 +81,7 @@ Every example in this repository produces or consumes invoices that conform to t
 | Operation | Description |
 |---|---|
 | **[Create XRechnung](https://www.invoicexml.com/docs/api/create/xrechnung)** | Build an XRechnung 3.0 XML invoice from a structured JSON request |
+| **[Send by email](https://www.invoicexml.com/docs/api/create/xrechnung/email)** | Generate the invoice and email it from your own verified domain in one API call |
 | **[Validate XRechnung](https://www.invoicexml.com/docs/api/validate/xrechnung)** | Verify an XRechnung file against the XSD, the EN 16931 Schematron, and the KoSIT BR-DE rules |
 | **[Extract JSON](https://www.invoicexml.com/docs/api/extract/json)** | Parse an XRechnung XML file into structured invoice data as JSON for downstream systems |
 | **[Render to PDF](https://www.invoicexml.com/docs/api/render/xrechnung/to/pdf)** | Render an XRechnung XML file into a human-readable PDF preview |
@@ -91,7 +93,7 @@ Every example in this repository produces or consumes invoices that conform to t
 
 ## Quick start by language
 
-Each language has its own folder containing all four operations as standalone, runnable files. Open the folder for your language to see installation steps, dependencies, and usage.
+Each language has its own folder containing all of these operations as standalone, runnable files. Open the folder for your language to see installation steps, dependencies, and usage.
 
 ### Create and validate XRechnung with C# / .NET
 
@@ -203,6 +205,48 @@ Many downstream systems (ERPs, accounting software, expense management tools) wo
 The invoice document sits under the **`invoice`** key of the response, so you read `invoice.seller.name` or `invoice.totals.grandTotalAmount` (BT-112). A complete sample response with every field of the invoice model populated is in [json/extract-json-response.json](./json/extract-json-response.json); optional fields that are absent from the source document come back as `null` (empty arrays for lists).
 
 This is the fastest way to get invoice data out of an XRechnung file and into a modern data pipeline.
+
+---
+
+## Send XRechnung invoices by email
+
+Generate an invoice and deliver it in one API call. [`POST /v1/create/xrechnung/email`](https://www.invoicexml.com/docs/api/create/xrechnung/email) takes the same request as [`POST /v1/create/xrechnung`](https://www.invoicexml.com/docs/api/create/xrechnung) plus an `email` object, builds and validates the invoice, and sends the XRechnung XML as an attachment from your own domain. See [email delivery for XRechnung](https://www.invoicexml.com/api/create/xrechnung/email).
+
+Setup takes three steps:
+
+1. Add your domain on the [Verified email domains](https://www.invoicexml.com/account/sending-domains) page of your dashboard.
+2. Add the DNS records it shows you. Verification usually completes within minutes and can take up to 72 hours.
+3. Call the route, with any address on that domain as the sender.
+
+```js
+const response = await fetch('https://api.invoicexml.com/v1/create/xrechnung/email', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + apiKey,
+    },
+    body: JSON.stringify({
+        invoice,
+        email: {
+            from:    'invoices@yourcompany.com',
+            to:      'customer@example.com',
+            subject: 'Invoice XR-2026-001',
+            message: 'Hello,\n\nPlease find attached invoice XR-2026-001.\n\nKind regards',
+        },
+    }),
+});
+```
+
+The answer is `{"status":"accepted","messageId":"..."}` instead of the file: the email was handed over for delivery. `subject` and `message` are optional, and `cc`, `bcc` and `replyTo` are available too. If your plan does not include email delivery the API answers 403, and [pricing](https://www.invoicexml.com/pricing) shows what does.
+
+| Language | Create and send |
+|---|---|
+| C# / .NET | [`SendEmail.cs`](./csharp/SendEmail.cs) |
+| Java | [`SendEmail.java`](./java/SendEmail.java) |
+| PHP | [`send-email.php`](./php/send-email.php) |
+| Node.js | [`send-email.js`](./nodejs/send-email.js) |
+| Python | [`send_email.py`](./python/send_email.py) |
+| Ruby | [`send_email.rb`](./ruby/send_email.rb) |
 
 ---
 

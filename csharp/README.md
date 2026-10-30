@@ -34,6 +34,7 @@ If you prefer plain `HttpClient` over Flurl, every example translates directly. 
 | File | Operation | API endpoint |
 |---|---|---|
 | [`Create.cs`](./Create.cs) | Build an XRechnung 3.0 XML invoice | [`POST /v1/create/xrechnung`](https://www.invoicexml.com/docs/api/create/xrechnung) |
+| [`SendEmail.cs`](./SendEmail.cs) | Create an XRechnung invoice and email it from your own domain | [`POST /v1/create/xrechnung/email`](https://www.invoicexml.com/docs/api/create/xrechnung/email) |
 | [`Validate.cs`](./Validate.cs) | Validate an XRechnung file against the KoSIT rules | [`POST /v1/validate/xrechnung`](https://www.invoicexml.com/docs/api/validate/xrechnung) |
 | [`ExtractJson.cs`](./ExtractJson.cs) | Parse an XRechnung XML into JSON | [`POST /v1/extract/json`](https://www.invoicexml.com/docs/api/extract/json) |
 | [`AiConvert.cs`](./AiConvert.cs) | (Experimental) Convert a plain PDF to XRechnung with AI | [`POST /v1/transform/to/xrechnung`](https://www.invoicexml.com/docs/api/transform/to/xrechnung) |

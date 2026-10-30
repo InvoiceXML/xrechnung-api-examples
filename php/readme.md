@@ -31,6 +31,7 @@ These examples use the built-in `curl_*` functions and `CURLFile` (available sin
 | File | Operation | API endpoint |
 |---|---|---|
 | [`create.php`](./create.php) | Build an XRechnung 3.0 XML invoice | [`POST /v1/create/xrechnung`](https://www.invoicexml.com/docs/api/create/xrechnung) |
+| [`send-email.php`](./send-email.php) | Create an XRechnung invoice and email it from your own domain | [`POST /v1/create/xrechnung/email`](https://www.invoicexml.com/docs/api/create/xrechnung/email) |
 | [`validate.php`](./validate.php) | Validate an XRechnung file against the KoSIT rules | [`POST /v1/validate/xrechnung`](https://www.invoicexml.com/docs/api/validate/xrechnung) |
 | [`extract-json.php`](./extract-json.php) | Parse an XRechnung XML into JSON | [`POST /v1/extract/json`](https://www.invoicexml.com/docs/api/extract/json) |
 | [`ai-convert.php`](./ai-convert.php) | (Experimental) Convert a plain PDF to XRechnung with AI | [`POST /v1/transform/to/xrechnung`](https://www.invoicexml.com/docs/api/transform/to/xrechnung) |
